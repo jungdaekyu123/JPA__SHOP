@@ -13,15 +13,68 @@
 <div th:replace="~{ nav.html::navbar}"></div>
 
 
-<a th:href="@{/detail/{id}(id=${i.id})}" class="card" th:each = "i : ${items}">
+<div class="card" th:each = "i : ${items}">
+
     <img src="https://placehold.co/300">
     <div>
-        <h4 th:text="${i.title}">바지</h4>
-        <p th:text="${i.price + '원'}">7억</p>
+        <div>
+            <a th:href="@{/detail/{id}(id=${i.id})}">
+                <h4 th:text="${i.title}">바지</h4>
+            </a>
+
+            <p th:text="${i.price + '원'}">7억</p>
+
+            <a th:href="@{/edit/{id}(id=${i.id})}">✏️</a>
+            <button class="btn-delete" th:data-id="${i.id}">🗑️</button>
+        </div>
     </div>
 
+</div>
 
-</a>
+<script>
+
+    document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function () {
+        const itemId = this.getAttribute('data-id');
+
+        if (confirm('정말 삭제하시겠습니까?')) {
+            fetch('/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id=${itemId}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('삭제되었습니다.');
+                    this.closest('.card').remove();
+                } else {
+                    response.text().then(msg => alert(msg));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('삭제에 실패했습니다.');
+            });
+        }
+    });
+});
+
+
+
+
+ <!--    document.querySelectorAll('.btn')[1].addEventListener('click',function() {-->
+ <!--    fetch('/test1', {-->
+ <!--        method : 'POST',-->
+ <!--        headers : { 'Content-Type' : 'application/json' },-->
+ <!--        body : JSON.stringify({ name : 'kim'})-->
+ <!--        })-->
+ <!--    })-->
+
+
+
+</script>
 
 
 

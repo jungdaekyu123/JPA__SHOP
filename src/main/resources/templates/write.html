@@ -11,6 +11,7 @@
 <body>
 
 <div th:replace="~{ nav.html::navbar}"></div>
+
 <div th:if="${errorMessage != null}">
     <p th:text="${errorMessage}" style="color: red;"></p>
 </div>

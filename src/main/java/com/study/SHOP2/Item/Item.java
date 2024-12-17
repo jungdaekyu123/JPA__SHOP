@@ -1,4 +1,4 @@
-package com.study.SHOP2;
+package com.study.SHOP2.Item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,21 +19,24 @@ public class Item {
     private Integer price;
 
     public void setPrice(Integer price) {
-        if (price == null || price < 0) {
+        if (price == null ) {
             System.out.println("가격은 0원 이상이여야합니다. 기본값 0을 사용합니다.");
             this.price = 0;
+        } else if(price < 0 ){
+            System.out.println("가격은 음수일수 없습니다. 기존 가격을 유지합니다.");
         } else {
             this.price = price;
         }
     }
-        public void setTitle (String title){
-            if (title == null || title.trim().isEmpty()) {
-                System.out.println("제목은 비어있을 수 없습니다. 기본값 'Unnamed'를 사용합니다.");
-                this.title = "Unnamed"; // 기본값으로 설정
-            } else {
-                this.title = title;
-            }
+
+    public void setTitle (String title){
+        if (title == null || title.trim().isEmpty()) {
+            System.out.println("제목은 비어있을 수 없습니다. 기본값 'Unnamed'를 사용합니다.");
+            this.title = "Unnamed"; // 기본값으로 설정
+        } else {
+            this.title = title;
         }
+    }
 
 //     기본 생성자
 //    public Item() {
