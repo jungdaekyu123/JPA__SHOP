@@ -133,16 +133,20 @@ public class ItemController {
         }
 
 
-    @PostMapping("/delete")
-    @ResponseBody
-    public ResponseEntity<String> deleteItem(@RequestParam Integer id) {
-        boolean isDeleted = itemService.deleteItemById(id);
-        if (isDeleted) {
-            return ResponseEntity.ok("삭제 성공");
-        } else {
-            return ResponseEntity.status(404).body("삭제 실패: 아이템을 찾을 수 없습니다.");
+        @PostMapping("/delete")
+        @ResponseBody
+        public ResponseEntity<String> deleteItem(@RequestParam Integer id) {
+            boolean isDeleted = itemService.deleteItemById(id);
+            if (isDeleted) {
+                return ResponseEntity.ok("삭제 성공");
+            } else {
+                return ResponseEntity.status(404).body("삭제 실패: 아이템을 찾을 수 없습니다.");
+            }
         }
-    }
+
+
+
+
 
 
 
