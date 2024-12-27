@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,10 +52,12 @@ public class RegisterController {
         System.out.println("비밀번호" + registerDto.getPassword());
         System.out.println("닉네임" + registerDto.getDisplayName());
 
+        Map<String, Object> response = new HashMap<>();
+
         if (bindingResult.hasErrors()) {
             System.out.println("RegisterDto____: " + registerDto);
             System.out.println("bindingResult2" + bindingResult.getAllErrors());
-            Map<String, Object> response = new HashMap<>();
+
 
             response.put("success", false);
             response.put("errors", bindingResult.getAllErrors().stream()
@@ -65,12 +68,12 @@ public class RegisterController {
 
         try {
             registerService.register(registerDto);
-            Map<String, Object> response = new HashMap<>();
+
             response.put("success", true);
             System.out.println("response!!!!" + response);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            Map<String, Object> response = new HashMap<>();
+
             response.put("success", false);
             response.put("errors", List.of(e.getMessage()));
             return ResponseEntity.badRequest().body(response);
@@ -105,7 +108,7 @@ public class RegisterController {
         Map<String, Object> response = new HashMap<>();
 
         //닉네임 중복체크
-        if(memberRepository.existsBydisplayName(displayName)) {
+        if(memberRepository.existsByDisplayName(displayName)) {
             response.put("success",false);
             response.put("errors",new String[]{"이미 존재하는 닉네임입니다."});
         } else {
@@ -113,6 +116,41 @@ public class RegisterController {
         }
         return ResponseEntity.ok(response);
     }
+
+
+
+    // 로그인
+    @GetMapping("/login")
+    public String login() {
+        var result = memberRepository.findByUsername("eorb");
+       // System.out.println(result.get().getDisplayName());
+        return "login.html";
+    }
+
+    // 마이페이지
+    @GetMapping("/my-page")
+    public String myPage(Authentication auth) {
+        // Authentication 아니면 principal 써도됌
+        System.out.println(auth);
+        System.out.println(auth.getName());
+        System.out.println(auth.isAuthenticated());
+
+        //if()
+        return "mypage.html";
+    }
+
+
+//    @GetMapping("/test-username-exists")
+//    @ResponseBody
+//    public ResponseEntity<Map<String, Object>> testUsernameExists(@RequestBody Map<String, String> request) {
+//        String username = request.get("username");
+//        boolean exists = memberRepository.existsByUsername(username);
+//        System.out.println("Test ExistsByUsername: " + username + " => " + exists);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("exists", exists);
+//        return ResponseEntity.ok(response);
+//    }
 
 
 

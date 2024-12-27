@@ -17,15 +17,17 @@ public class RegisterService {
 
         validateRegisterDto(registerDto);
         checkDuplicateUsername(registerDto.getUsername());
+        checkDuplicatedisplayName(registerDto.getDisplayName());
 
         // 새로운 회원 정보 저장
         Member member = new Member();
         member.setUsername(registerDto.getUsername());
         member.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         member.setDisplayName(registerDto.getDisplayName());
-        memberRepository.save(member);
-    }
+        Member savedMember = memberRepository.save(member);
+        System.out.println("Saved Member: " + savedMember);
 
+    }
 
 
         private void validateRegisterDto(RegisterDto registerDto) {
@@ -41,18 +43,37 @@ public class RegisterService {
         }
 
         // 아이디 중복 체크
+//        private void checkDuplicateUsername(String username) {
+//            if (memberRepository.findByUsername(username) != null) {
+//                throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+//            }
+//        }
+        
+        //아이디 중복확인
         private void checkDuplicateUsername(String username) {
-            if (memberRepository.findByUsername(username) != null) {
+            boolean exists = memberRepository.existsByUsername(username);
+            //System.out.println("Check Duplicate Username: " + username + ", Exists: " + exists);
+            if (exists) {
                 throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
             }
         }
 
-        //닉네임 중복체크
+
+
+//        //닉네임 중복체크
+//        private void checkDuplicatedisplayName(String displayName) {
+//         if (memberRepository.findByDisplayName(displayName) != null) {
+//             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+//           }
+//        }
+
         private void checkDuplicatedisplayName(String displayName) {
-         if (memberRepository.findBydisplayName(displayName) != null) {
-             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-           }
-        }
+            boolean exists = memberRepository.existsByDisplayName(displayName);
+            //System.out.println("Check Duplicate DisplayName: " + displayName + ", Exists: " + exists);
+            if (exists) {
+                throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            }
+    }
 
     }
 // 흐름 회원가입 요청 register() 메서드 호출 -> RegisterDto객체(사용자가입력한거) 받아옴
