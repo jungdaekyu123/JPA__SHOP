@@ -1,5 +1,6 @@
 package com.study.SHOP2.Item;
 
+import com.study.SHOP2.User.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,11 @@ public class Item {
    // @Column(nullable = false, columnDefinition = "TEXT")
     private String title; //title이라는 컬럼추가한거
     private Integer price;
+//    private String displayName;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     public void setPrice(Integer price) {
         if (price == null ) {

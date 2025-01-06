@@ -21,11 +21,22 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable());
         http.authorizeHttpRequests((authorize) ->
-                authorize.requestMatchers("/**").permitAll()
+                authorize
+                   .requestMatchers("/register").not().authenticated() //로그인 되지 않은 사용자만 /register 들어갈수있도록
+                   .requestMatchers("/**").permitAll()
         );
+
         http.formLogin((formLogin) -> formLogin.loginPage("/login")
-                .defaultSuccessUrl("/")
+                .defaultSuccessUrl("/list",true)
                // .failureUrl("/fail")
+        );
+
+        http.logout((logout) -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/list")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
         );
 
         return http.build();

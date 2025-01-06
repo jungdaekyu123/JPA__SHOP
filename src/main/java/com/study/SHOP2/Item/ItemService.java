@@ -1,6 +1,10 @@
 package com.study.SHOP2.Item;
 
+import com.study.SHOP2.User.Member;
+import com.study.SHOP2.User.MemberRepository;
+import com.study.SHOP2.User.RegisterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +15,7 @@ import java.util.Optional;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final MemberRepository memberRepository;
 
 
     //모든 item 목록조회
@@ -20,10 +25,23 @@ public class ItemService {
 
     // 아이템 저장 service
     //함수로 뺄땐 안에 있는 변수들도 따로 정의해야함
-    public void saveItem(String title, Integer price) {
+    public void saveItem(String title, Integer price, Authentication authentication) {
+
         Item item = new Item();
         item.setTitle(title);
         item.setPrice(price);
+
+        String username = authentication.getName();
+     //   System.out.println("username" + username);
+        Optional<Member> memberOptional = memberRepository.findByUsername(username);
+
+        if(memberOptional.isPresent()) {
+            Member member = memberOptional.get();
+            item.setMember(member);
+        } else {
+            throw new IllegalArgumentException("로그인된 유저를 찾을수 없다");
+        }
+
         itemRepository.save(item);
         /*
          * item.java에서 기본생성자를 만들면 item.setTitle(title); 이렇게 말고

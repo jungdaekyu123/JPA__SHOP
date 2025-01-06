@@ -4,6 +4,7 @@ import com.study.SHOP2.Notice;
 import com.study.SHOP2.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,8 @@ public class ItemController {
 
     @PostMapping("/add")
     public ModelAndView addPost(@RequestParam(name = "title") String title,
-                                @RequestParam(name = "price") Integer price
+                                @RequestParam(name = "price") Integer price,
+                                Authentication authentication
     ) {
 
         ModelAndView mav = new ModelAndView();
@@ -68,7 +70,7 @@ public class ItemController {
             return mav;
         }
 
-        itemService.saveItem(title,price);
+        itemService.saveItem(title,price,authentication);
         mav.setViewName("redirect:/list");
         return mav;
     }

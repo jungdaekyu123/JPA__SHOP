@@ -32,7 +32,12 @@ public class RegisterController {
 
     // 회원가입
     @GetMapping("/register")
-    public String registerForm() {
+    public String registerForm(Authentication auth) {
+        
+        // 로그인된 사용자가 회원가입 들어가는게 이상하니 막아줌
+        if(auth !=null && auth.isAuthenticated()) {
+            return "redirect:/list";
+        }
 
         return "register.html";
     }

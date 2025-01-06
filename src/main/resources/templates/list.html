@@ -24,6 +24,8 @@
 
             <p th:text="${i.price + '원'}">7억</p>
 
+            <p>작성자: <span th:text="${i.member != null ? i.member.displayName : '알 수 없음'}">작성자 이름</span></p>  <!-- 작성자 표시 -->
+
             <a th:href="@{/edit/{id}(id=${i.id})}">✏️</a>
             <button class="btn-delete" th:data-id="${i.id}">🗑️</button>
         </div>

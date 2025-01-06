@@ -21,11 +21,11 @@ public class UserLoginService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        var result = memberRepository.findByUsername(username);
+        var result = memberRepository.findByUsername(username); // repo를 통해 사용자 정보(username)가져옴
 
         if(result.isEmpty()) {
             throw new UsernameNotFoundException("그런아이디 없음");
-        }
+        } // 간단한 예외처리
 
         var user = result.get();
         List<GrantedAuthority> authorityList = new ArrayList<>();
