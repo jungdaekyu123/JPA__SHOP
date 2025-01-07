@@ -144,6 +144,46 @@ public class RegisterController {
         return "mypage.html";
     }
 
+    // object변환 -> DTo 연습
+    // object형식에 password까지 보낸다 보안취약 > Map자료형으로 필요한것만 넣기 , 새로운 object에 필요한 것만 넣어서 보내기
+    @GetMapping("/user/1")
+    @ResponseBody
+    public Data getUser() {
+        var a = memberRepository.findById(1L);
+        var result = a.get();
+
+//        var map = new HashMap<>();
+//        map.put();  이게 첫번쨰 방법
+
+        var data = new Data(result.getUsername(),result.getDisplayName());
+//        data.username = result.getUsername();
+//        data.displayName = result.getDisplayName();
+
+
+        return data;
+    }
+
+    // Data Transfer Object dto
+    // (constructor)는 더 만들수 있음 오버로딩(이름은 같은데 매개변수타입,개수,순서 다른것)
+    class Data {
+        public String username;
+        public String displayName;
+        public Long id;
+
+        Data(String a, String b) {
+            this.username = a;
+            this.displayName = b;
+        }
+        Data(String a, String b, Long c) {
+            this.username = a;
+            this.displayName = b;
+            this.id = c;
+        }
+    }
+
+    // bulider라는 것도 참고해보자 유용할듯
+
+
 
 //    @GetMapping("/test-username-exists")
 //    @ResponseBody

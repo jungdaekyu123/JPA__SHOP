@@ -17,12 +17,15 @@
 </div>
 
 <form action="/add" method="POST">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     <input name="title">
     <input name="price">
     <button type="submit">전송</button>
 </form>
 
-
+<!--th:name="${_csrf.parameterName}": 서버가 기대하는 CSRF 토큰의 이름입니다.
+ th:value="${_csrf.token}": 실제 CSRF 토큰 값입니다.
+-->
 
 
 </body>

@@ -14,6 +14,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ItemService {
 
+    // DB입출력하려면 뭐부터 해야함 3스탭
+    // 1. repository interface 만들고
+    // 2. 등록하고
+    // 3. 사용
+
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
 
