@@ -4,6 +4,9 @@ import com.study.SHOP2.User.Member;
 import com.study.SHOP2.User.MemberRepository;
 import com.study.SHOP2.User.RegisterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -107,6 +110,18 @@ public class ItemService {
             return true;
         }
         return false;
+    }
+
+    //페이지나누기(pagination)
+    private static final int PAGE_SIZE = 3;
+    public Page<Item> getPaging(int page) {
+        if (page < 1) {
+           page = 1;
+        }
+        int currentPage = page -1;
+
+        return itemRepository.findAll(PageRequest.of(currentPage,PAGE_SIZE, Sort.by(Sort.Direction.DESC,"id")));
+        // id대신 createdAt을 사용 해보기
     }
 
 

@@ -48,3 +48,40 @@ input {
   display : block;
   margin : auto;
 }
+
+.pagination {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 1em 0;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination li a {
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* 마우스 오버 시 색상 변경 */
+.pagination li a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 현재 페이지인 경우 (active) */
+.pagination li.active a {
+    background-color: #007bff; /* 마우스오버한 것처럼 파란색 */
+    color: #fff;               /* 글자색 흰색 */
+    pointer-events: none;      /* 클릭 불가능하게 (선택사항) */
+    cursor: default;           /* 마우스 포인터 모양 변경 (선택사항) */
+}
+

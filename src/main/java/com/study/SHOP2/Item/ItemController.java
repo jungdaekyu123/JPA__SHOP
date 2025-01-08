@@ -3,6 +3,8 @@ package com.study.SHOP2.Item;
 import com.study.SHOP2.Notice;
 import com.study.SHOP2.NoticeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -33,7 +35,8 @@ public class ItemController {
         List<Item> result = itemService.getAllItems();
         // System.out.println(result);
         model.addAttribute("items", result);
-        return "list.html";
+        //return "list.html";
+        return "redirect:/list/page/1";
     }
 
     @GetMapping("/notice")
@@ -145,6 +148,40 @@ public class ItemController {
                 return ResponseEntity.status(404).body("삭제 실패: 아이템을 찾을 수 없습니다.");
             }
         }
+
+    //페이지나누기(pagination)
+    @GetMapping("/list/page/{page}")
+    public String pagination(Model model, @PathVariable(value = "page",required = false) Integer page) {
+
+//       int currentPage = 0; // 기본값 설정
+//        if(page !=null && page > 0 ) {
+//            currentPage = page -1;
+//         }
+
+//        int currentPage;
+//        if(page == null) {
+//            currentPage = 0; // 페이지가 null이면 0으로 설정
+//        } else if (page > 0) {
+//            currentPage = page - 1; // 올바른 페이지 번호면 클라이언트가보낸 파라미터 -1
+//        } else {
+//            currentPage = 0; // 잘못된 페이지 번호도 0으로
+//        }
+
+        // 개선점 pathVariable이 null일경우 대비
+        if(page == null || page < 1 ) {
+            page = 1;
+        }
+
+        Page<Item> pageN = itemService.getPaging(page);
+        model.addAttribute("items", pageN);// 현재 페이지의 아이템 목록
+        model.addAttribute("currentPage", page); // 현재 페이지 번호
+        model.addAttribute("totalPages", pageN.getTotalPages()); // 총 페이지 수
+
+        return "list.html";
+    }
+
+
+
 
 
 
