@@ -35,6 +35,11 @@ public class ItemService {
     //함수로 뺄땐 안에 있는 변수들도 따로 정의해야함
     public void saveItem(String title, Integer price, Authentication authentication,String imageUrl) {
 
+        // 상세페이지 업로드안하면 기본값 고정
+        if(imageUrl == null || imageUrl.trim().isEmpty()) {
+            imageUrl = "https://placehold.co/300";
+        } 
+
         Item item = new Item();
         item.setTitle(title);
         item.setPrice(price);

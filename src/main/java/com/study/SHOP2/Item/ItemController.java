@@ -87,9 +87,12 @@ public class ItemController {
 
             Optional<Item> result = itemService.getItemById(id);
             if (result.isPresent()) {
+                Item item = result.get();
+              //  System.out.println("조회된 아이템: " + item);  // 디버깅용 출력
                 model.addAttribute("items", result.get());
             } else {
                 model.addAttribute("errorMessage", "해당 아이템을 찾을 수 없습니다.");
+                return "redirect:/list/page/1";
             }
             return "detail.html";
 
@@ -102,8 +105,8 @@ public class ItemController {
     public String edit(@PathVariable Integer id ,Model model) {
 
         Optional<Item> result =  itemService.findItemById(id);
-//        System.out.println("Requested ID: " + id);
-//        System.out.println("Result: " + result);
+    //        System.out.println("Requested ID: " + id);
+    //        System.out.println("Result: " + result);
         if (result.isPresent()) {
             model.addAttribute("data",result.get());
             return "edit.html";
@@ -184,13 +187,13 @@ public class ItemController {
     }
 
 
-
+    // S3이미지
     @GetMapping("/presigned-url")
     @ResponseBody // 유저에게 보낼때 씀
     String getURL(@RequestParam String filename) {
-        System.out.println(filename);
+        //System.out.println(filename);
          var result =  s3Service.createPresignedUrl("test/" + filename);
-        System.out.println("s3테스트 :" + result);
+         //System.out.println("s3테스트 :" + result);
         return result;
     }
 
