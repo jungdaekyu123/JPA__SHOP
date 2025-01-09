@@ -33,11 +33,13 @@ public class ItemService {
 
     // 아이템 저장 service
     //함수로 뺄땐 안에 있는 변수들도 따로 정의해야함
-    public void saveItem(String title, Integer price, Authentication authentication) {
+    public void saveItem(String title, Integer price, Authentication authentication,String imageUrl) {
 
         Item item = new Item();
         item.setTitle(title);
         item.setPrice(price);
+        item.setImageUrl(imageUrl);
+
 
         String username = authentication.getName();
      //   System.out.println("username" + username);

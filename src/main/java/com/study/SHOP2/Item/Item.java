@@ -19,6 +19,7 @@ public class Item {
     private String title; //title이라는 컬럼추가한거
     private Integer price;
 //    private String displayName;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -63,4 +64,5 @@ public class Item {
 //                ", price=" + price +
 //                '}';
 //    }
+    //ALTER TABLE item ADD COLUMN image_url VARCHAR(255); 하자 추가로
 }

@@ -3,9 +3,9 @@
     <a href="/list">List</a>
     <a href="/write">Write</a>
 
-    <span sec:authorize="isAuthenticated()">안녕하세요, <span th:text="${#authentication.name}"></span>님!</span>
+    <span class="greeting" sec:authorize="isAuthenticated()">안녕하세요, <span th:text="${#authentication.name}"></span>님!</span>
 <!--    <a href="/logout" sec:authorize="isAuthenticated()">Logout</a>-->
-    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+    <form class="logout-form" th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
         <button type="submit">Logout</button>
     </form>
 

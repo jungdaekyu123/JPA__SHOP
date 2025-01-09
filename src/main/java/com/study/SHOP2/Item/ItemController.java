@@ -23,6 +23,8 @@ public class ItemController {
     private final ItemRepository itemRepository;
     private final NoticeRepository noticeRepository;
     private final ItemService itemService;
+    private final S3Service s3Service;
+
 
 //    @Autowired
 //    public ItemController(ItemRepository itemRepository) {
@@ -55,7 +57,8 @@ public class ItemController {
     @PostMapping("/add")
     public ModelAndView addPost(@RequestParam(name = "title") String title,
                                 @RequestParam(name = "price") Integer price,
-                                Authentication authentication
+                                Authentication authentication,
+                                @RequestParam String imageUrl
     ) {
 
         ModelAndView mav = new ModelAndView();
@@ -73,7 +76,7 @@ public class ItemController {
             return mav;
         }
 
-        itemService.saveItem(title,price,authentication);
+        itemService.saveItem(title,price,authentication,imageUrl);
         mav.setViewName("redirect:/list");
         return mav;
     }
@@ -181,6 +184,15 @@ public class ItemController {
     }
 
 
+
+    @GetMapping("/presigned-url")
+    @ResponseBody // 유저에게 보낼때 씀
+    String getURL(@RequestParam String filename) {
+        System.out.println(filename);
+         var result =  s3Service.createPresignedUrl("test/" + filename);
+        System.out.println("s3테스트 :" + result);
+        return result;
+    }
 
 
 
