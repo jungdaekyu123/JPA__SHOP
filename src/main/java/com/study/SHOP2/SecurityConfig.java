@@ -31,14 +31,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
          //        http.csrf((csrf) -> csrf.disable());
-        http.csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-                .ignoringRequestMatchers("/login")
+        http.csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository())
+                // 로그인 요청과 댓글 요청에 대해 csrf 예외적용
+                .ignoringRequestMatchers("/login","/comment")
         );
 
         http.authorizeHttpRequests((authorize) ->
                 authorize
-                   .requestMatchers("/register").not().authenticated() //로그인 되지 않은 사용자만 /register 들어갈수있도록
+                   .requestMatchers("/register").not().authenticated() //로그인 되지 않은 사용자만 /register 들어갈수있도록.requestMatchers("/comment").authenticated()
                    .requestMatchers("/list").authenticated() // 로그인된 사람만
+                   .requestMatchers("/comment").authenticated() // 로그인한사람 댓글
                    .requestMatchers("/**").permitAll()
         );
 

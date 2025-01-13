@@ -2,30 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Detail Page</title>
     <link href="/main.css" rel="stylesheet">
+
+    <!-- CSRF 토큰 -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
 
+<!-- 네비게이션 -->
 <div th:replace="~{ nav.html::navbar}"></div>
 
-
+<!-- 상세 페이지 내용 -->
 <div class="detail" th:if="${items != null}">
-
     <h4>상세페이지</h4>
     <img th:src="${items.imageUrl != null ? items.imageUrl : 'https://placehold.co/300'}" alt="Uploaded Image">
-
     <h4 th:text="${items.title}">금도금 바지</h4>
     <p th:text="${items.price}">7억</p>
 </div>
 
+<!-- 댓글 작성 폼 -->
+<form id="commentForm" th:action="@{/comment}" method="POST">
+    <input name="username" type="text" th:value="'유저아이디: ' + ${#authentication.name}" readonly>
+    <input type="hidden" name="parentId" th:value="${items.id}" />
+    <input name="content" type="text" placeholder="댓글쓰기" required />
+    <button type="submit">댓글쓰기</button>
+</form>
+
+<!-- 댓글 목록 -->
+<ul id="commentList"></ul>
+
+<!-- 오류 메시지 표시 -->
 <div th:if="${errorMessage != null}">
     <p th:text="${errorMessage}" style="color: red;"></p>
 </div>
 
+<!-- 댓글 추가를 위한 JavaScript -->
+<script>
+
+
+    document.querySelector('#commentForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // 기본 폼 제출 막기
+
+        // 폼 데이터 가져오기
+        const formData = new FormData(this);
+
+        // CSRF 토큰 가져오기
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        // AJAX 요청 보내기
+        fetch('/comment', {
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            },
+            body: formData
+        }) // 여기서 보내는것 content , parentId
+        .then(response => response.json())
+        .then(data => {
+            // 댓글 목록에 새 댓글 추가
+            const commentList = document.querySelector('#commentList');
+            const newComment = document.createElement('li');
+            newComment.textContent = `${data.username}: ${data.content}`;
+            commentList.appendChild(newComment);
+
+            // 폼 초기화
+            this.reset();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    });
+
+    // 페이지로드시 서버에서 댓글 목록 가져오기
+    document.addEventListener('DOMContentLoaded',function () {
+        const parentId = document.querySelector('input[name="parentId"]').value;
+
+        fetch(`/comments/${parentId}`)
+            .then(response => response.json())
+            .then(data => {
+                const commentList = document.querySelector('#commentList')
+                data.forEach(comment => {
+                    const newComment = document.createElement('li');
+                    newComment.textContent = `${comment.username}: ${comment.content}`;
+                    commentList.appendChild(newComment);
+                });
+            })
+            .catch(error => {
+                console.log(error);
+            });
+
+
+    });
+</script>
 
 </body>
 </html>
