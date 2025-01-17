@@ -16,9 +16,8 @@ public class Item {
     private Integer id;
 
    // @Column(nullable = false, columnDefinition = "TEXT")
-    private String title; //title이라는 컬럼추가한거
+    private String title; //title이라는 컬럼추가한거,추가적으로 검색기능만들때 검색대상임
     private Integer price;
-//    private String displayName;
     private String imageUrl;
 
     @ManyToOne

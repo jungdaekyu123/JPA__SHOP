@@ -131,6 +131,13 @@ public class ItemService {
         // id대신 createdAt을 사용 해보기
     }
 
+    //검색기능
+    public List<Item> searchItem(String keyword) {
+       // System.out.println("서비스 레벨 키워드: " + keyword);
+        keyword = keyword.trim();
+        return itemRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
 
 
 

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -195,6 +194,18 @@ public class ItemController {
          var result =  s3Service.createPresignedUrl("test/" + filename);
          //System.out.println("s3테스트 :" + result);
         return result;
+    }
+
+
+    //검색기능
+    @GetMapping("/search")
+    public String search(@RequestParam String keyword, Model model) {
+        System.out.printf("검색 키워드 : " + keyword);
+        List<Item> result = itemService.searchItem(keyword);
+        model.addAttribute("items", result); // key, value
+        model.addAttribute("keyword", keyword);
+
+        return "list.html";
     }
 
 
