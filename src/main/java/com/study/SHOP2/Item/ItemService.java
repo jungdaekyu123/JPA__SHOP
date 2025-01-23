@@ -6,6 +6,7 @@ import com.study.SHOP2.User.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -132,10 +133,11 @@ public class ItemService {
     }
 
     //검색기능
-    public List<Item> searchItem(String keyword) {
+    public Page<Item> searchItemFullText(String keyword,int page,int pageSize) {
        // System.out.println("서비스 레벨 키워드: " + keyword);
         keyword = keyword.trim();
-        return itemRepository.findByTitleContainingIgnoreCase(keyword);
+        Pageable pageable = PageRequest.of(page -1,pageSize);
+        return itemRepository.searchByTitleFullText(keyword,pageable);
     }
 
 

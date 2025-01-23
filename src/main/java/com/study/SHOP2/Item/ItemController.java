@@ -32,11 +32,7 @@ public class ItemController {
     
     //목록
     @GetMapping("/list")
-    String list(Model model) {
-        List<Item> result = itemService.getAllItems();
-        // System.out.println(result);
-        model.addAttribute("items", result);
-        //return "list.html";
+    String redirectToFirstPage() {
         return "redirect:/list/page/1";
     }
 
@@ -173,14 +169,26 @@ public class ItemController {
 //        }
 
         // 개선점 pathVariable이 null일경우 대비
-        if(page == null || page < 1 ) {
+        if (page == null || page < 1) {
             page = 1;
         }
+        // 한페이지네이션에서 보여줄 페이지수
+        int pageGroupSize = 10;
 
+        //페이지네이션 그룹계산
+
+        
+        // 페이징 데이터 서비스부분에서 받아오기
         Page<Item> pageN = itemService.getPaging(page);
+        int currentGroup = (page -1) / pageGroupSize;
+        int startPage = currentGroup * pageGroupSize + 1;
+        int endPage = Math.min(startPage + pageGroupSize -1, itemService.getPaging(page).getTotalPages());
+        
         model.addAttribute("items", pageN);// 현재 페이지의 아이템 목록
         model.addAttribute("currentPage", page); // 현재 페이지 번호
         model.addAttribute("totalPages", pageN.getTotalPages()); // 총 페이지 수
+        model.addAttribute("startPage", startPage); // 현재 그룹의 시작 페이지 번호
+        model.addAttribute("endPage", endPage); // 현재 그룹의 끝 페이지 번호
 
         return "list.html";
     }
@@ -198,34 +206,41 @@ public class ItemController {
 
 
     //검색기능
-    @GetMapping("/search")
-    public String search(@RequestParam String keyword, Model model) {
-        System.out.printf("검색 키워드 : " + keyword);
-        List<Item> result = itemService.searchItem(keyword);
+    @GetMapping( "/search")
+    public String search(@RequestParam(required = false) String keyword,
+                         @RequestParam(defaultValue = "1") int page,
+                         Model model) {
+       // System.out.printf("검색 키워드 : " + keyword);
+
+        if (page < 1) {
+            page = 1;
+        }
+        if (keyword == null || keyword.isEmpty()) {
+            keyword = ""; // 기본값 설정
+        }
+
+        int pageSize = 3;
+        int pageGroupSize = 10;
+
+
+        Page<Item> result = itemService.searchItemFullText(keyword, page, pageSize);
+        int currentGroup = (page - 1) / pageGroupSize;
+        int startPage = currentGroup * pageGroupSize + 1;
+        int endPage = Math.min(startPage + pageGroupSize - 1, result.getTotalPages());
+
+
         model.addAttribute("items", result); // key, value
         model.addAttribute("keyword", keyword);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", result.getTotalPages());
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
         return "list.html";
     }
 
 
-
-
-
-
-
-
-
-
-//
-//        @PostMapping ("/test1")
-//        String test(@RequestBody Map<String, Object> body) {
-//            System.out.println(body);
-//         return "redirect:/list";
-//        }
-
-
-    }
+   }
 
 
 
