@@ -120,23 +120,29 @@ public class ItemService {
         return false;
     }
 
-    //페이지나누기(pagination)
+    //페이지나누기(pagination)  (/list/page/{page})
     private static final int PAGE_SIZE = 3;
     public Page<Item> getPaging(int page) {
         if (page < 1) {
            page = 1;
         }
-        int currentPage = page -1;
+        int currentPage = page -1; // jpa 페이지 번호는 0부터 시작해서
+        Page<Item> pageN = itemRepository.findAll(PageRequest.of(currentPage, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id")));
+       // System.out.println("getPaging: 요청한 페이지=" + page + ", 실제 content.size()=" + pageN.getContent().size());
+
 
         return itemRepository.findAll(PageRequest.of(currentPage,PAGE_SIZE, Sort.by(Sort.Direction.DESC,"id")));
         // id대신 createdAt을 사용 해보기
     }
 
-    //검색기능
+    //검색기능 (/search?keyword=XXX&page={page})
     public Page<Item> searchItemFullText(String keyword,int page,int pageSize) {
-       // System.out.println("서비스 레벨 키워드: " + keyword);
+
         keyword = keyword.trim();
         Pageable pageable = PageRequest.of(page -1,pageSize);
+        if(keyword.isEmpty()){
+            return itemRepository.findAll(pageable);
+        }
         return itemRepository.searchByTitleFullText(keyword,pageable);
     }
 

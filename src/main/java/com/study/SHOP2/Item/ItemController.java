@@ -154,20 +154,6 @@ public class ItemController {
     @GetMapping("/list/page/{page}")
     public String pagination(Model model, @PathVariable(value = "page",required = false) Integer page) {
 
-//       int currentPage = 0; // 기본값 설정
-//        if(page !=null && page > 0 ) {
-//            currentPage = page -1;
-//         }
-
-//        int currentPage;
-//        if(page == null) {
-//            currentPage = 0; // 페이지가 null이면 0으로 설정
-//        } else if (page > 0) {
-//            currentPage = page - 1; // 올바른 페이지 번호면 클라이언트가보낸 파라미터 -1
-//        } else {
-//            currentPage = 0; // 잘못된 페이지 번호도 0으로
-//        }
-
         // 개선점 pathVariable이 null일경우 대비
         if (page == null || page < 1) {
             page = 1;
@@ -175,21 +161,23 @@ public class ItemController {
         // 한페이지네이션에서 보여줄 페이지수
         int pageGroupSize = 10;
 
-        //페이지네이션 그룹계산
-
-        
         // 페이징 데이터 서비스부분에서 받아오기
         Page<Item> pageN = itemService.getPaging(page);
+        int totalPages = pageN.getTotalPages();
+
         int currentGroup = (page -1) / pageGroupSize;
         int startPage = currentGroup * pageGroupSize + 1;
-        int endPage = Math.min(startPage + pageGroupSize -1, itemService.getPaging(page).getTotalPages());
+        int endPage = Math.min(startPage + pageGroupSize -1, totalPages);
         
         model.addAttribute("items", pageN);// 현재 페이지의 아이템 목록
         model.addAttribute("currentPage", page); // 현재 페이지 번호
-        model.addAttribute("totalPages", pageN.getTotalPages()); // 총 페이지 수
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수
         model.addAttribute("startPage", startPage); // 현재 그룹의 시작 페이지 번호
         model.addAttribute("endPage", endPage); // 현재 그룹의 끝 페이지 번호
+        model.addAttribute("searchMode", false);
 
+
+        
         return "list.html";
     }
 
@@ -210,13 +198,10 @@ public class ItemController {
     public String search(@RequestParam(required = false) String keyword,
                          @RequestParam(defaultValue = "1") int page,
                          Model model) {
-       // System.out.printf("검색 키워드 : " + keyword);
 
-        if (page < 1) {
-            page = 1;
-        }
-        if (keyword == null || keyword.isEmpty()) {
-            keyword = ""; // 기본값 설정
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return "redirect:/list/page/1";
         }
 
         int pageSize = 3;
@@ -235,6 +220,7 @@ public class ItemController {
         model.addAttribute("totalPages", result.getTotalPages());
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        model.addAttribute("searchMode", true);
 
         return "list.html";
     }

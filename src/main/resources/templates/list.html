@@ -30,7 +30,7 @@
     <p>결과가 없습니다.</p>
 </div>
 
-<div class="card" th:each = "i : ${items}">
+<div class="card" th:each = "i : ${items.content}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     <img th:src="${i.imageUrl != null && !i.imageUrl.isEmpty() ? i.imageUrl : 'https://placehold.co/300x300'}" alt="Uploaded Image PlZ" style="width: 150px; height: auto;">
      <!-- alt란? 이미지 로드안될때 표시될 대체 텍스트 -->
@@ -58,24 +58,30 @@
 <div th:if="${totalPages != null}">
     <ul class="pagination">
         <!-- 이전 그룹 -->
-        <li th:if="${startPage > 1}">
-            <a th:href="${keyword != null and keyword != ''} ? @{/search(keyword=${keyword}, page=${startPage - 1})} : @{/list/page/${startPage - 1}}">
-                이전
-            </a>
+        <li th:if="${startPage > 1}"
+            th:with="prevUrl = (keyword != null and keyword != '')
+                       ? @{/search(keyword=${keyword}, page=${startPage - 1})}
+                       : @{/list/page/{page}(page=${startPage - 1})}">
+            <a th:href="${prevUrl}">이전</a>
         </li>
 
         <!-- 페이지 번호 -->
         <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
             th:classappend="${i == currentPage} ? 'active' : ''">
-            <a th:href="${keyword != null and keyword != ''} ? @{/search(keyword=${keyword}, page=${i})} : @{/list/page/${i}}"
+            <a th:href="${searchMode
+                  ? '/search?keyword=' + keyword + '&page=' + i
+                  : '/list/page/' + i}"
                th:text="${i}"></a>
         </li>
 
+
+
         <!-- 다음 그룹 -->
-        <li th:if="${endPage < totalPages}">
-            <a th:href="${keyword != null and keyword != ''} ? @{/search(keyword=${keyword}, page=${endPage + 1})} : @{/list/page/${endPage + 1}}">
-                다음
-            </a>
+        <li th:if="${endPage < totalPages}"
+            th:with="nextUrl = (keyword != null and keyword != '')
+                       ? @{/search(keyword=${keyword}, page=${endPage + 1})}
+                       : @{/list/page/{page}(page=${endPage + 1})}">
+            <a th:href="${nextUrl}">다음</a>
         </li>
     </ul>
 </div>
