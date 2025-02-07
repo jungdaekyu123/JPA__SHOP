@@ -1,62 +1,70 @@
 package com.study.SHOP2;
 
+import com.study.SHOP2.User.CustomUserDetailsService;
+
+import com.study.SHOP2.session.LoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
+    private final CustomUserDetailsService userDetailsService;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
-    @Bean
-    public CsrfTokenRepository csrfTokenRepository() {
-        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-        repository.setHeaderName("X-XSRF-TOKEN");
-        return repository;
-    }
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         //        http.csrf((csrf) -> csrf.disable());
-        http.csrf(csrf -> csrf
-                .csrfTokenRepository(csrfTokenRepository())
-                // 로그인 요청과 댓글 요청에 대해 csrf 예외적용
-                .ignoringRequestMatchers("/login","/comment")
+        http
+                .securityContext(context -> context.requireExplicitSave(false))
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/login", "/comment","/css/**",
+                                "/js/**", "/images/**", "/main.css","/extend-session", "/session-info")
+                );
+
+
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/css/**", "/js/**", "/images/**","/main.css").permitAll()
+                .requestMatchers("/admin/access-denied").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/login", "/register").permitAll()
+                .anyRequest().authenticated()
         );
 
-        http.authorizeHttpRequests((authorize) ->
-                authorize
-                   .requestMatchers("/register").not().authenticated() //로그인 되지 않은 사용자만 /register 들어갈수있도록.requestMatchers("/comment").authenticated()
-                   .requestMatchers("/list").authenticated() // 로그인된 사람만
-                   .requestMatchers("/comment").authenticated() // 로그인한사람 댓글
-                   .requestMatchers("/**").permitAll()
+        http.formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/list", true)
+                .successHandler(new LoginSuccessHandler())
         );
 
-        http.formLogin((formLogin) -> formLogin.loginPage("/login")
-                .defaultSuccessUrl("/list",true)
-               // .failureUrl("/fail")
+        http.userDetailsService(userDetailsService);
+
+        http.exceptionHandling(exception -> exception
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendRedirect("/access-denied");
+                })
         );
 
-        http.logout((logout) -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-        );
+
 
         return http.build();
     }
