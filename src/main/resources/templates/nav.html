@@ -1,15 +1,18 @@
-<div class="nav" th:fragment="navbar">
+<div class="nav" th:fragment="navbar" >
     <a class="logo">SHOP</a>
     <a href="/list">List</a>
     <a href="/write">Write</a>
+    <a href="/admin/dashboard" th:if="${#authorization.expression('hasRole(''ADMIN'')')}" data-link>관리자 페이지</a>
+    <span class="greeting" sec:authorize="isAuthenticated()">
+        안녕하세요, <span th:text="${#authentication.name}"></span>님!</span>
 
-    <span class="greeting" sec:authorize="isAuthenticated()">안녕하세요, <span th:text="${#authentication.name}"></span>님!</span>
-<!--    <a href="/logout" sec:authorize="isAuthenticated()">Logout</a>-->
     <form class="logout-form" th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
         <button type="submit">Logout</button>
     </form>
 
     <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+
+    <span id="session-timer" sec:authorize="isAuthenticated()" style="display: none;">남은 세션시간</span>
 </div>
 
 <!-- (참고3) html 덩어리로 변수나 데이터같은걸 전송해줄 수도 있습니다.

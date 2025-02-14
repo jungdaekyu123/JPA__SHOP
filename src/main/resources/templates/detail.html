@@ -24,6 +24,32 @@
     <p th:text="${items.price}">7억</p>
 </div>
 
+<!-- 주문 버튼 -->
+<button id="order-btn">주문하기</button>
+
+<div id="order-form" style="display: none">
+    <h3>주문정보입력</h3>
+    <form id="order-form-content">
+        <label for="itemName">상품명:</label>
+        <input type="text" id="itemName" name="itemName" readonly th:value="${items.title}"><br>
+
+        <label for="price">가격:</label>
+        <input type="text" id="price" name="price" readonly th:value="${items.price}"><br>
+
+        <label for="count">수량:</label>
+        <input type="number" id="count" name="count" value="1" min="1"><br>
+
+        <label for="buyer">구매자:</label>
+        <input type="text" id="buyer" name="buyer" th:value="${#authentication.name}" readonly><br>
+
+        <button type="submit">주문 확정</button>
+        <button type="button" id="cancel-btn">취소</button>
+
+    </form>
+</div>
+
+
+
 <!-- 댓글 작성 폼 -->
 <form id="commentForm" th:action="@{/comment}" method="POST">
     <input name="username" type="text" th:value="'유저아이디: ' + ${#authentication.name}" readonly>
@@ -42,8 +68,6 @@
 
 <!-- 댓글 추가를 위한 JavaScript -->
 <script>
-
-
     document.querySelector('#commentForm').addEventListener('submit', function (event) {
         event.preventDefault(); // 기본 폼 제출 막기
 
@@ -98,6 +122,63 @@
 
 
     });
+    sessionStorage.setItem('isLoggedIn', [[${#authentication.principal != null}]]);
+
+
+    document.addEventListener("DOMContentLoaded",function () {
+        const orderBtn = document.getElementById("order-btn");
+        const orderForm = document.getElementById("order-form");
+        const cancelBtn = document.getElementById("cancel-btn");
+        const orderSumit = document.getElementById("order-form-content");
+
+        // 주문 버튼 클릭 시 주문 폼 표시
+        orderBtn.addEventListener("click", () => {
+            orderForm.style.display = "block";
+        });
+
+        // 취소 버튼 클릭 시 주문 폼 숨기기
+        cancelBtn.addEventListener("click", () => {
+            orderForm.style.display = "none";
+        });
+
+        // 주문 제출 시 AJAX 요청
+        orderSumit.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(orderSumit);
+
+            // CSRF 토큰 가져오기
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            fetch("/sales/order", {
+                method: "POST",
+                body: new URLSearchParams(formData), //
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    [csrfHeader]: csrfToken
+                }
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("주문이 완료되었습니다.");
+                        orderForm.style.display = "none";
+                    } else {
+                        alert("주문 실패: " + data.message);
+                    }
+                }).catch(error => {
+                console.error("주문 오류:", error);
+            });
+        });
+
+
+    });
+
+
+
+
+
+
 </script>
 <script src="/js/session-timer.js"></script>
 </body>

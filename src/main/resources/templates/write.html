@@ -7,28 +7,33 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link href="/main.css" rel="stylesheet">
+    <meta name="isAuthenticated" content="[[${#authentication.authenticated}]]">
 </head>
 <body>
 
 <div th:replace="~{ nav.html::navbar}"></div>
 
-<div th:if="${errorMessage != null}">
-    <p th:text="${errorMessage}" style="color: red;"></p>
+<div id="content">
+    <div th:if="${errorMessage != null}">
+        <p th:text="${errorMessage}" style="color: red;"></p>
+    </div>
+
+
+    <input type="file" onchange="getURL(this)">
+    <form action="/add" method="POST">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <!-- 업로드된 이미지 URL을 담는 hidden input -->
+        <input type="hidden" name="imageUrl" id="imageUrl">
+        <input name="title" placeholder="Title">
+        <input name="price" placeholder="Price">
+        <!-- 업로드된 이미지 미리보기 -->
+        <div id="preview" style="margin-top: 10px;"></div>
+
+        <button type="submit">전송</button>
+    </form>
+
 </div>
 
-
-<input type="file" onchange="getURL(this)">
-<form action="/add" method="POST">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <!-- 업로드된 이미지 URL을 담는 hidden input -->
-    <input type="hidden" name="imageUrl" id="imageUrl">
-    <input name="title" placeholder="Title">
-    <input name="price" placeholder="Price">
-    <!-- 업로드된 이미지 미리보기 -->
-    <div id="preview" style="margin-top: 10px;"></div>
-
-    <button type="submit">전송</button>
-</form>
 
 
 
@@ -40,6 +45,7 @@
 -->
 
 <script>
+
 
   async function getURL(e) {
         let file = e.files[0];
@@ -72,6 +78,6 @@
 
 </script>
 
-
+<script src="/js/session-timer.js"></script>
 </body>
 </html>

@@ -9,90 +9,96 @@
     <link href="/main.css" rel="stylesheet">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="isAuthenticated" content="[[${#authentication.authenticated}]]">
+
 </head>
 <body>
 
 <div th:replace="~{ nav.html::navbar}"></div>
+<div id="content">
+    <!-- 검색기능 -->
+    <form th:action="@{/search}" method="get">
+        <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="display:inline" th:value="${keyword != null ? keyword : ''}" required />
+        <button type="submit">검색</button>
+    </form>
 
-<!-- 검색기능 -->
-<form th:action="@{/search}" method="get">
-    <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="display:inline" th:value="${keyword != null ? keyword : ''}" required />
-    <button type="submit">검색</button>
-</form>
+    <!-- 검색 결과 여부 -->
+    <div th:if="${keyword != null}">
+        <h2 th:text="'검색 결과: ' + ${keyword}"></h2>
+    </div>
 
-<!-- 검색 결과 여부 -->
-<div th:if="${keyword != null}">
-    <h2 th:text="'검색 결과: ' + ${keyword}"></h2>
-</div>
+    <!-- 결과 없음 -->
+    <div th:if="${#lists.isEmpty(items)}">
+        <p>결과가 없습니다.</p>
+    </div>
 
-<!-- 결과 없음 -->
-<div th:if="${#lists.isEmpty(items)}">
-    <p>결과가 없습니다.</p>
-</div>
+    <div class="card" th:each = "i : ${items.content}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <img th:src="${i.imageUrl != null && !i.imageUrl.isEmpty() ? i.imageUrl : 'https://placehold.co/300x300'}" alt="Uploaded Image PlZ" style="width: 150px; height: auto;">
+        <!-- alt란? 이미지 로드안될때 표시될 대체 텍스트 -->
 
-<div class="card" th:each = "i : ${items.content}">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <img th:src="${i.imageUrl != null && !i.imageUrl.isEmpty() ? i.imageUrl : 'https://placehold.co/300x300'}" alt="Uploaded Image PlZ" style="width: 150px; height: auto;">
-     <!-- alt란? 이미지 로드안될때 표시될 대체 텍스트 -->
-
-    <div>
         <div>
-            <a th:href="@{/detail/{id}(id=${i.id})}">
-                <h4 th:text="${i.title}">바지</h4>
-            </a>
+            <div>
+                <a th:href="@{/detail/{id}(id=${i.id})}">
+                    <h4 th:text="${i.title}">바지</h4>
+                </a>
 
-            <p th:text="${i.price + '원'}">7억</p>
+                <p th:text="${i.price + '원'}">7억</p>
 
-            <p>작성자: <span th:text="${i.member != null ? i.member.displayName : '알 수 없음'}">작성자 이름</span></p>  <!-- 작성자 표시 -->
+                <p>작성자: <span th:text="${i.member != null ? i.member.displayName : '알 수 없음'}">작성자 이름</span></p>  <!-- 작성자 표시 -->
 
-            <a th:href="@{/edit/{id}(id=${i.id})}">✏️</a>
-            <button class="btn-delete" th:data-id="${i.id}">🗑️</button>
+                <a th:href="@{/edit/{id}(id=${i.id})}">✏️</a>
+                <button class="btn-delete" th:data-id="${i.id}">🗑️</button>
+            </div>
         </div>
+
+    </div>
+
+
+
+    <!--페이지네이션-->
+    <div th:if="${totalPages != null}">
+        <ul class="pagination">
+            <!-- 이전 그룹 -->
+            <li th:if="${startPage > 1}"
+                th:with="prevUrl = (keyword != null and keyword != '')
+                       ? @{/search(keyword=${keyword}, page=${startPage - 1})}
+                       : @{/list/page/{page}(page=${startPage - 1})}">
+                <a th:href="${prevUrl}">이전</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active' : ''">
+                <a th:href="${searchMode
+                  ? '/search?keyword=' + keyword + '&page=' + i
+                  : '/list/page/' + i}"
+                   th:text="${i}"></a>
+            </li>
+
+
+
+            <!-- 다음 그룹 -->
+            <li th:if="${endPage < totalPages}"
+                th:with="nextUrl = (keyword != null and keyword != '')
+                       ? @{/search(keyword=${keyword}, page=${endPage + 1})}
+                       : @{/list/page/{page}(page=${endPage + 1})}">
+                <a th:href="${nextUrl}">다음</a>
+            </li>
+        </ul>
     </div>
 
 </div>
 
 
 
-<!--페이지네이션-->
-<div th:if="${totalPages != null}">
-    <ul class="pagination">
-        <!-- 이전 그룹 -->
-        <li th:if="${startPage > 1}"
-            th:with="prevUrl = (keyword != null and keyword != '')
-                       ? @{/search(keyword=${keyword}, page=${startPage - 1})}
-                       : @{/list/page/{page}(page=${startPage - 1})}">
-            <a th:href="${prevUrl}">이전</a>
-        </li>
-
-        <!-- 페이지 번호 -->
-        <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
-            th:classappend="${i == currentPage} ? 'active' : ''">
-            <a th:href="${searchMode
-                  ? '/search?keyword=' + keyword + '&page=' + i
-                  : '/list/page/' + i}"
-               th:text="${i}"></a>
-        </li>
-
-
-
-        <!-- 다음 그룹 -->
-        <li th:if="${endPage < totalPages}"
-            th:with="nextUrl = (keyword != null and keyword != '')
-                       ? @{/search(keyword=${keyword}, page=${endPage + 1})}
-                       : @{/list/page/{page}(page=${endPage + 1})}">
-            <a th:href="${nextUrl}">다음</a>
-        </li>
-    </ul>
-</div>
-
-
 
 
 <script>
+sessionStorage.setItem('isLoggedIn', [[${#authentication.principal != null}]]);
 
-    document.querySelectorAll('.btn-delete').forEach(button => {
-    button.addEventListener('click', function () {
+document.querySelectorAll('.btn-delete').forEach(button => {
+button.addEventListener('click', function () {
         const itemId = this.getAttribute('data-id');
          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
          const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
